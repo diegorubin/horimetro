@@ -7,7 +7,6 @@ AM_CPPFLAGS = ${horimetro_CFLAGS}
 bin_PROGRAMS = horimetro
 
 horimetro_SOURCES = window.c \
-										services.c \
                     main.c
 
 horimetro_LDADD = ${horimetro_LIBS}
