@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Horimetro
+GenericName=Horimetro
+Comment=Horimetro
+Exec=/usr/bin/horimetro
+Icon=/usr/share/horimetro/icon.png
+Terminal=false
+Type=Application
+Categories=GNOME;GTK;Accessories;
