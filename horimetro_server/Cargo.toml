@@ -1,0 +1,7 @@
+[package]
+name = "horimetro_server"
+version = "0.1.0"
+authors = ["Diego Rubin <rubin.diego@gmail.com>"]
+edition = "2018"
+
+[dependencies]
