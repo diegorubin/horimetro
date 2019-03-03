@@ -2,6 +2,7 @@
 #include <glib.h>
 #include <gio/gio.h>
 
+#include "last_command_frame.h"
 #include "window.h"
 
 #define DAEMON_NAME     "com.diegorubin.horimetro"
@@ -28,20 +29,14 @@ void method_handler(GDBusConnection *conn,
         gpointer user_data)
 {
   if (!g_strcmp0(method_name, "AddLastCommand")) {
-    gint input=-1;
+    const gchar* command;
 
-    g_variant_get(parameters, "(i)", &input);
-    if (input == -1) {
-      g_dbus_method_invocation_return_error(invocation,
-                      G_DBUS_ERROR,
-                      G_DBUS_ERROR_INVALID_ARGS,
-                      "Invalid argument");
-      return ;
-    }
+    g_variant_get(parameters, "(s)", &command);
 
-    input += 10;
+    add_command(command);
+
     g_dbus_method_invocation_return_value(invocation,
-                    g_variant_new("(i)", input));
+                    g_variant_new("(s)", "retorno"));
     return;
   }
 
@@ -49,15 +44,12 @@ void method_handler(GDBusConnection *conn,
       G_DBUS_ERROR,
       G_DBUS_ERROR_INVALID_ARGS,
       "Invalid method");
-
-
 }
 
 struct appcore {
   GDBusConnection *conn;
   guint owner_id;
   GDBusNodeInfo *node_info;
-  GDBusObjectManagerServer *manager_server;
 
   GMainLoop *loop;
 };
@@ -75,7 +67,6 @@ static void on_bus_acquired(GDBusConnection *conn,
   guint regid;
   GError *err;
 
-  g_print("on_bus_acquired() is called");
   struct appcore *data = (struct appcore *)user_data;
   data->conn = conn;
 
@@ -97,7 +88,6 @@ static void on_name_acquired(GDBusConnection *conn,
             const gchar *name,
             gpointer user_data)
 {
-  g_print("on_name_acquired() is called");
 }
 
 static void on_name_lost(GDBusConnection *conn,
@@ -139,9 +129,6 @@ int main (int argc, char **argv)
   struct appcore data = {
     .conn = NULL,
     .node_info = NULL,
-    .manager_server = NULL,
-
-    .loop = NULL,
   };
 
   GtkApplication *app;
@@ -149,7 +136,6 @@ int main (int argc, char **argv)
 
   app = gtk_application_new("com.diegorubin.horimetro.gui", G_APPLICATION_FLAGS_NONE);
   g_signal_connect(app, "activate", G_CALLBACK (main_window_activate), NULL);
-
 
   init_dbus(&data);
 

@@ -3,6 +3,8 @@
 
 #include <gtk/gtk.h>
 
+#include "last_command_frame.h"
+
 void main_window_activate(GtkApplication* app, gpointer user_data);
 
 #endif
