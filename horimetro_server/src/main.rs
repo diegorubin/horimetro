@@ -1,24 +1,38 @@
-use std::net::{TcpListener, TcpStream, Shutdown};
-use std::io::{Write, Read};
-use std::str::from_utf8;
+use std::net::{TcpListener, TcpStream};
+use std::io::{BufReader, BufWriter, Write, BufRead};
 use std::io::Result;
 use std::thread;
 
-fn handle_client(mut stream: TcpStream) {
-    let mut data = [0 as u8; 50];
-    while match stream.read_exact(&mut data) {
-        Ok(_) => {
-            let message = from_utf8(&data).unwrap();
-            println!("Receiving {}", message);
-            stream.write(b"received").unwrap();
-            true
+mod dbus_client;
+
+fn handle_client(stream: TcpStream) {
+
+    let mut reader = BufReader::new(&stream);
+    let mut raw_message = String::new();
+    reader.read_line(&mut raw_message).expect("Could not read");
+    println!("command received: {}", raw_message.trim());
+
+    let mut writer = BufWriter::new(&stream);
+    writer.write_all("received command\n".as_bytes()).expect("could not write");
+    writer.flush().expect("could not flush");
+
+    let command: &str = &raw_message.trim();
+    match command {
+        "AddCommand" => {
+            let mut reader = BufReader::new(&stream);
+            let mut raw_message = String::new();
+            reader.read_line(&mut raw_message).expect("Could not read");
+            println!("received: {}", raw_message.trim());
+
+            dbus_client::add_command(raw_message);
         },
-        Err(_) => {
-            println!("An error occurred, terminating connection with {}", stream.peer_addr().unwrap());
-            stream.shutdown(Shutdown::Both).unwrap();
-            false
+        _ => {
+            println!("command not found!");
         }
-    } {}
+    }
+
+    let mut writer = BufWriter::new(&stream);
+    writer.write_all("to client\n".as_bytes()).expect("Could not write");
 }
 
 fn main() -> Result<()> {
