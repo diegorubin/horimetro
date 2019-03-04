@@ -1,14 +1,16 @@
 use std::net::{TcpStream};
-use std::io::{BufReader, BufWriter, Write, Read, BufRead};
+use std::io::{BufReader, BufWriter, Write, BufRead};
 use std::io::Result;
-use std::str::from_utf8;
+use std::env;
 
 fn main() -> Result<()> {
+    let args: Vec<String> = env::args().collect();
+
     match TcpStream::connect("127.0.0.1:21000") {
-        Ok(mut stream) => {
+        Ok(stream) => {
 
             let mut writer = BufWriter::new(&stream);
-            writer.write_all("AddCommand\n".as_bytes()).expect("could not write");
+            writer.write_all(format!("{}\n", args[1]).as_bytes()).expect("could not write");
             writer.flush().expect("could not flush");
 
             let mut reader = BufReader::new(&stream);
@@ -16,7 +18,7 @@ fn main() -> Result<()> {
             reader.read_line(&mut response).expect("could not read");
             println!("Server response: {}", response);
 
-            writer.write_all("ls -ls\n".as_bytes()).expect("could not write");
+            writer.write_all(format!("{}\n", args[2]).as_bytes()).expect("could not write");
             writer.flush().expect("could not flush");
         },
         Err(e) => {
