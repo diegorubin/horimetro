@@ -18,6 +18,7 @@ GtkWidget* build_last_command_frame()
 void add_command(const gchar *str)
 {
   GtkWidget *label = gtk_label_new(str);
-  gtk_box_pack_start(GTK_BOX(commands_box), label, TRUE, TRUE, 0);
+  gtk_widget_set_halign(label, GTK_ALIGN_START);
+  gtk_box_pack_end(GTK_BOX(commands_box), label, FALSE, FALSE, 0);
   gtk_widget_show(GTK_WIDGET(label));
 }

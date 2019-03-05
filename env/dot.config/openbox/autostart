@@ -1,0 +1,5 @@
+iptables -F &
+/usr/bin/horimetro &
+/usr/bin/horimetro_server &
+xset -dpms s off
+

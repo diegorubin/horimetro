@@ -6,7 +6,14 @@ use std::env;
 fn main() -> Result<()> {
     let args: Vec<String> = env::args().collect();
 
-    match TcpStream::connect("127.0.0.1:21000") {
+    let mut server_address = String::from("127.0.0.1:21000");
+
+    match env::var("HORIMETRO_SERVER") {
+        Ok(value) => server_address = value.to_owned(),
+        Err(e) => println!("Couldn't read HORIMETRO_SERVER ({})", e),
+    };
+
+    match TcpStream::connect(server_address) {
         Ok(stream) => {
 
             let mut writer = BufWriter::new(&stream);

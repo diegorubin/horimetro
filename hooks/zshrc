@@ -1,0 +1,10 @@
+#----
+function printc () {
+  export HORIMETRO_SERVER=192.168.0.23:21000
+  /usr/bin/horimetro_client AddCommand "$1" > /dev/null
+}
+
+autoload -Uz  add-zsh-hook
+
+add-zsh-hook preexec printc
+
