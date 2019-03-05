@@ -26,6 +26,9 @@ fn handle_client(stream: TcpStream) {
 
             dbus_client::add_command(raw_message);
         },
+        "ShowNextFrame" => {
+            dbus_client::show_next_frame();
+        },
         _ => {
             println!("command not found!");
         }
