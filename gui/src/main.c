@@ -16,6 +16,8 @@ static const gchar introspection_xml[] =
 "    <arg type='s' name='command' direction='in'/>"              
 "    <arg type='s' name='result' direction='out'/>"              
 "  </method>"                               
+"  <method name='ShowNextFrame'>"                      
+"  </method>"                               
 "  </interface>"                              
 "</node>"; 
 
@@ -36,10 +38,14 @@ void method_handler(GDBusConnection *conn,
     add_command(command);
 
     g_dbus_method_invocation_return_value(invocation,
-                    g_variant_new("(s)", "retorno"));
+                    g_variant_new("(s)", command));
     return;
   }
 
+  if (!g_strcmp0(method_name, "ShowNextFrame")) {
+    show_next_frame();
+    return;
+  }
   g_dbus_method_invocation_return_error(invocation,
       G_DBUS_ERROR,
       G_DBUS_ERROR_INVALID_ARGS,
