@@ -12,12 +12,15 @@
 static const gchar introspection_xml[] = 
 "<node>"                                  
 "  <interface name='com.diegorubin.horimetro.Gui'>"              
-"  <method name='AddLastCommand'>"                      
-"    <arg type='s' name='command' direction='in'/>"              
-"    <arg type='s' name='result' direction='out'/>"              
-"  </method>"                               
-"  <method name='ShowNextFrame'>"                      
-"  </method>"                               
+"    <method name='AddLastCommand'>"                      
+"      <arg type='s' name='command' direction='in'/>"              
+"      <arg type='s' name='result' direction='out'/>"              
+"    </method>"                               
+"    <method name='ShowNextFrame'>"                      
+"    </method>"                               
+"    <method name='CheckIn'>"                      
+"      <arg type='i' name='value' direction='in'/>"              
+"    </method>"                               
 "  </interface>"                              
 "</node>"; 
 
@@ -46,6 +49,16 @@ void method_handler(GDBusConnection *conn,
     show_next_frame();
     return;
   }
+
+  if (!g_strcmp0(method_name, "CheckIn")) {
+    const guint value;
+
+    g_variant_get(parameters, "(i)", &value);
+
+    set_check_in(value);
+    return;
+  }
+
   g_dbus_method_invocation_return_error(invocation,
       G_DBUS_ERROR,
       G_DBUS_ERROR_INVALID_ARGS,

@@ -14,7 +14,7 @@ void main_window_activate(GtkApplication* app, gpointer user_data)
 
   window = gtk_application_window_new(app);
   gtk_window_set_title(GTK_WINDOW(window), "Horimetro");
-  gtk_window_set_default_size(GTK_WINDOW(window), 200, 200);
+  gtk_window_set_default_size(GTK_WINDOW(window), 480, 320);
   gtk_window_fullscreen(GTK_WINDOW(window));
   gtk_container_set_border_width(GTK_CONTAINER(window), 15);
 

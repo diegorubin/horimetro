@@ -7,4 +7,6 @@ GtkWidget *main_display_frame;
 
 GtkWidget* build_main_display_frame();
 
+void set_check_in(guint value);
+
 #endif
