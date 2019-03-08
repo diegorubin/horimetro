@@ -1,6 +1,5 @@
 use dbus::{Connection, BusType, Message};
 
-
 static SERVICE: &str = "com.diegorubin.horimetro";
 static PATH: &str = "/com/diegorubin/horimetro";
 static INTERFACE: &str = "com.diegorubin.horimetro.Gui";
