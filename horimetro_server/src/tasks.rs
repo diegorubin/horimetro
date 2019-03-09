@@ -30,7 +30,7 @@ pub fn insert_task(key: String) {
         initied_in: 0,
         ended_in: 0,
     };
-    let bytes = bincode::serialize(&task).unwrap();
+    let bytes = serialize(&task).unwrap();
     tree.set(key.to_owned(), bytes);
 
     tree.flush();
@@ -41,13 +41,12 @@ pub fn get_task(key: String) {
     match tree.get(key.to_owned()) {
         Ok(value) => {
             match value {
-                println!("value is {}", value);
                 None => {
                     println!("content of key {} is None", key);
                 },
-                _ => {
+                content => {
                     let bytes = content.unwrap();
-                    let task: Task = bincode::deserialize(&bytes).unwrap();
+                    let task: Task = deserialize(&bytes).unwrap();
                     println!("{:?}", task);
                 }
             };

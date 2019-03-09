@@ -49,6 +49,13 @@ fn handle_client(stream: TcpStream) {
 
             tasks::get_task(raw_message);
         },
+        "CheckIn" => {
+            let mut reader = BufReader::new(&stream);
+            let mut raw_message = String::new();
+            reader.read_line(&mut raw_message).expect("Could not read");
+
+            dbus_client::check_in(raw_message.trim().to_string());
+        },
         _ => {
             println!("command not found!");
         }
