@@ -7,11 +7,13 @@ gfloat elapsed = 0;
 GtkWidget *timer_label_init;
 GtkWidget *timer_label_end;
 GtkWidget *timer_progress;
+GtkWidget *timer_label_elapsed;
 
 GtkWidget* build_main_display_frame()
 {
   GtkWidget *main_box;
   GtkWidget *timer_box;
+  GtkWidget *tasks_box;
 
   GtkWidget *timer_label_init_description;
   GtkWidget *timer_label_end_description;
@@ -29,31 +31,57 @@ GtkWidget* build_main_display_frame()
   timer_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(GTK_BOX(main_box), timer_box, FALSE, FALSE, 0);
 
-  timer_label_init_description = gtk_label_new("Entrada: ");
+  timer_label_init_description = gtk_label_new("");
+  gtk_label_set_markup(GTK_LABEL(timer_label_init_description), "<span font=\"30\"><b>Entrada: </b></span>");
   gtk_box_pack_start(GTK_BOX(timer_box), timer_label_init_description, FALSE, TRUE, 0);
 
-  timer_label_init = gtk_label_new("08:00");
+  timer_label_init = gtk_label_new("");
+  gtk_label_set_markup(GTK_LABEL(timer_label_init), "");
   gtk_box_pack_start(GTK_BOX(timer_box), timer_label_init, FALSE, TRUE, 0);
 
-  timer_label_end = gtk_label_new("17:00");
+  timer_label_end = gtk_label_new("");
+  gtk_label_set_markup(GTK_LABEL(timer_label_end), "");
   gtk_box_pack_end(GTK_BOX(timer_box), timer_label_end, FALSE, TRUE, 0);
 
-  timer_label_end_description = gtk_label_new("Saída:");
+  timer_label_end_description = gtk_label_new("");
+  gtk_label_set_markup(GTK_LABEL(timer_label_end_description), "<span font=\"30\"><b>Saída: </b></span>");
   gtk_box_pack_end(GTK_BOX(timer_box), timer_label_end_description, FALSE, TRUE, 0);
 
+  tasks_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+  gtk_box_pack_start(GTK_BOX(main_box), tasks_box, TRUE, TRUE, 0);
+
+  timer_label_elapsed = gtk_label_new("");
+  gtk_label_set_markup(GTK_LABEL(timer_label_elapsed), "<span font=\"120\"><b>00:00</b></span>");
+  gtk_box_pack_start(GTK_BOX(tasks_box), timer_label_elapsed, FALSE, TRUE, 0);
 
   return main_display_frame;
 }
 
 gboolean update_elapsed_time(gpointer data)
 {
+  char *elapsed_markup;
+
   elapsed = elapsed + 1;
   gfloat value = elapsed / (check_out - check_in);
-  g_print("updating %f/%d %f\% \n", elapsed, (check_out - check_in), value);
 
   if (value <= 1) {
+    int elapsed_minutes = ((int) ((check_out - check_in) - elapsed)) % 60;
+    int elapsed_hours = ((int) (((check_out - check_in) - elapsed))) / 60;
+
+    const gchar* format = "<span color=\"red\" font=\"120\"><b>%02d:%02d</b></span>";
+    elapsed_markup = g_markup_printf_escaped(format, elapsed_hours, elapsed_minutes);
+
     gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(timer_progress), value);
+  } else {
+    int elapsed_minutes = ((int) (elapsed - (check_out - check_in)))  % 60;
+    int elapsed_hours = ((int) (elapsed - (check_out - check_in))) / 60;
+
+    const gchar* format = "<span color=\"green\" font=\"120\"><b>%02d:%02d</b></span>";
+    elapsed_markup = g_markup_printf_escaped(format, elapsed_hours, elapsed_minutes);
   }
+
+  gtk_label_set_markup(GTK_LABEL(timer_label_elapsed), elapsed_markup);
+  g_free(elapsed_markup);
 
   return TRUE;
 }
@@ -62,7 +90,7 @@ void set_check_in(guint value)
 {
   char *check_in_markup;
   char *check_out_markup;
-  const gchar* format = "%02d:%02d";
+  const gchar* format = "<span font=\"30\"><b>%02d:%02d</b></span>";
 
   check_in = value;
 
