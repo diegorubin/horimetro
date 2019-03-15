@@ -2,15 +2,16 @@
 
 guint check_in = 0;
 guint check_out = 0;
+gfloat elapsed = 0;
 
 GtkWidget *timer_label_init;
 GtkWidget *timer_label_end;
+GtkWidget *timer_progress;
 
 GtkWidget* build_main_display_frame()
 {
   GtkWidget *main_box;
   GtkWidget *timer_box;
-  GtkWidget *timer_progress;
 
   GtkWidget *timer_label_init_description;
   GtkWidget *timer_label_end_description;
@@ -23,7 +24,7 @@ GtkWidget* build_main_display_frame()
 
   timer_progress = gtk_progress_bar_new();
   gtk_box_pack_start(GTK_BOX(main_box), timer_progress, FALSE, FALSE, 0);
-  gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(timer_progress), 0.5);
+  gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(timer_progress), 0);
 
   timer_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(GTK_BOX(main_box), timer_box, FALSE, FALSE, 0);
@@ -42,6 +43,19 @@ GtkWidget* build_main_display_frame()
 
 
   return main_display_frame;
+}
+
+gboolean update_elapsed_time(gpointer data)
+{
+  elapsed = elapsed + 1;
+  gfloat value = elapsed / (check_out - check_in);
+  g_print("updating %f/%d %f\% \n", elapsed, (check_out - check_in), value);
+
+  if (value <= 1) {
+    gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(timer_progress), value);
+  }
+
+  return TRUE;
 }
 
 void set_check_in(guint value)
@@ -65,6 +79,8 @@ void set_check_in(guint value)
 
   gtk_label_set_markup(GTK_LABEL(timer_label_init), check_in_markup);
   gtk_label_set_markup(GTK_LABEL(timer_label_end), check_out_markup);
+
+  g_timeout_add(60000, update_elapsed_time, NULL);
 
   g_free(check_in_markup);
   g_free(check_out_markup);
