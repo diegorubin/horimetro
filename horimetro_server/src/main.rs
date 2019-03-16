@@ -5,35 +5,36 @@ use std::thread;
 
 mod dbus_client;
 
-fn handle_client(stream: TcpStream) {
-
-    let mut reader = BufReader::new(&stream);
+fn read_command(stream: &TcpStream) -> String {
+    let mut reader = BufReader::new(stream);
     let mut raw_message = String::new();
     reader.read_line(&mut raw_message).expect("Could not read");
     println!("command received: {}", raw_message.trim());
+    raw_message
+}
 
-    let mut writer = BufWriter::new(&stream);
-    writer.write_all("received command\n".as_bytes()).expect("could not write");
+fn write_response(stream: &TcpStream, response: &str) {
+    let mut writer = BufWriter::new(stream);
+    writer.write_all(response.as_bytes()).expect("could not write");
     writer.flush().expect("could not flush");
+}
 
-    let command: &str = &raw_message.trim();
+fn handle_client(stream: TcpStream) {
+
+    let main_command = read_command(&stream);
+    write_response(&stream, "received command\n");
+
+    let command: &str = &main_command.trim();
     match command {
         "AddCommand" => {
-            let mut reader = BufReader::new(&stream);
-            let mut raw_message = String::new();
-            reader.read_line(&mut raw_message).expect("Could not read");
-            println!("received: {}", raw_message.trim());
-
+            let raw_message = read_command(&stream);
             dbus_client::add_command(raw_message);
         },
         "ShowNextFrame" => {
             dbus_client::show_next_frame();
         },
         "CheckIn" => {
-            let mut reader = BufReader::new(&stream);
-            let mut raw_message = String::new();
-            reader.read_line(&mut raw_message).expect("Could not read");
-
+            let raw_message = read_command(&stream);
             dbus_client::check_in(raw_message.trim().to_string());
         },
         _ => {

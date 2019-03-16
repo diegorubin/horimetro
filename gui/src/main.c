@@ -17,9 +17,11 @@ static const gchar introspection_xml[] =
 "      <arg type='s' name='result' direction='out'/>"              
 "    </method>"                               
 "    <method name='ShowNextFrame'>"                      
+"      <arg type='s' name='result' direction='out'/>"              
 "    </method>"                               
 "    <method name='CheckIn'>"                      
 "      <arg type='i' name='value' direction='in'/>"              
+"      <arg type='s' name='result' direction='out'/>"              
 "    </method>"                               
 "  </interface>"                              
 "</node>"; 
@@ -47,6 +49,9 @@ void method_handler(GDBusConnection *conn,
 
   if (!g_strcmp0(method_name, "ShowNextFrame")) {
     show_next_frame();
+
+    g_dbus_method_invocation_return_value(invocation,
+                    g_variant_new("(s)", "ok"));
     return;
   }
 
@@ -56,6 +61,9 @@ void method_handler(GDBusConnection *conn,
     g_variant_get(parameters, "(i)", &value);
 
     set_check_in(value);
+
+    g_dbus_method_invocation_return_value(invocation,
+                    g_variant_new("(s)", "ok"));
     return;
   }
 
