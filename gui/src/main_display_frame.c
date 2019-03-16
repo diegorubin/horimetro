@@ -32,7 +32,7 @@ GtkWidget* build_main_display_frame()
   gtk_box_pack_start(GTK_BOX(main_box), timer_box, FALSE, FALSE, 0);
 
   timer_label_init_description = gtk_label_new("");
-  gtk_label_set_markup(GTK_LABEL(timer_label_init_description), "<span font=\"30\"><b>Entrada: </b></span>");
+  gtk_label_set_markup(GTK_LABEL(timer_label_init_description), "<span font=\"10\"><b>Entrada: </b></span>");
   gtk_box_pack_start(GTK_BOX(timer_box), timer_label_init_description, FALSE, TRUE, 0);
 
   timer_label_init = gtk_label_new("");
@@ -44,7 +44,7 @@ GtkWidget* build_main_display_frame()
   gtk_box_pack_end(GTK_BOX(timer_box), timer_label_end, FALSE, TRUE, 0);
 
   timer_label_end_description = gtk_label_new("");
-  gtk_label_set_markup(GTK_LABEL(timer_label_end_description), "<span font=\"30\"><b>Saída: </b></span>");
+  gtk_label_set_markup(GTK_LABEL(timer_label_end_description), "<span font=\"10\"><b>Saída: </b></span>");
   gtk_box_pack_end(GTK_BOX(timer_box), timer_label_end_description, FALSE, TRUE, 0);
 
   tasks_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
@@ -76,7 +76,7 @@ gboolean update_elapsed_time(gpointer data)
     int elapsed_minutes = ((int) (elapsed - (check_out - check_in)))  % 60;
     int elapsed_hours = ((int) (elapsed - (check_out - check_in))) / 60;
 
-    const gchar* format = "<span color=\"green\" font=\"120\"><b>%02d:%02d</b></span>";
+    const gchar* format = "<span color=\"green\" font=\"40\"><b>%02d:%02d</b></span>";
     elapsed_markup = g_markup_printf_escaped(format, elapsed_hours, elapsed_minutes);
   }
 
@@ -90,7 +90,7 @@ void set_check_in(guint value)
 {
   char *check_in_markup;
   char *check_out_markup;
-  const gchar* format = "<span font=\"30\"><b>%02d:%02d</b></span>";
+  const gchar* format = "<span font=\"10\"><b>%02d:%02d</b></span>";
 
   check_in = value;
 
