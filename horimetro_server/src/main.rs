@@ -1,13 +1,8 @@
-#[macro_use]
-extern crate serde_derive;
-extern crate bincode;
-
 use std::net::{TcpListener, TcpStream};
 use std::io::{BufReader, BufWriter, Write, BufRead};
 use std::io::Result;
 use std::thread;
 
-mod tasks;
 mod dbus_client;
 
 fn handle_client(stream: TcpStream) {
@@ -33,21 +28,6 @@ fn handle_client(stream: TcpStream) {
         },
         "ShowNextFrame" => {
             dbus_client::show_next_frame();
-        },
-        "AddTask" => {
-            let mut reader = BufReader::new(&stream);
-            let mut raw_message = String::new();
-            reader.read_line(&mut raw_message).expect("Could not read");
-            println!("received task: {}", raw_message.trim());
-
-            tasks::insert_task(raw_message);
-        },
-        "GetTask" => {
-            let mut reader = BufReader::new(&stream);
-            let mut raw_message = String::new();
-            reader.read_line(&mut raw_message).expect("Could not read");
-
-            tasks::get_task(raw_message);
         },
         "CheckIn" => {
             let mut reader = BufReader::new(&stream);
