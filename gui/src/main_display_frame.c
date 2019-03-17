@@ -76,6 +76,13 @@ GtkWidget* build_main_display_frame()
 
 void set_current_task(const gchar* code, const gchar* description)
 {
+  char *last_task_markup;
+  const gchar* last_task_format = "%s - %s";
+  last_task_markup = g_markup_printf_escaped(last_task_format, 
+    gtk_label_get_text(GTK_LABEL(task_label_code)),
+    gtk_label_get_text(GTK_LABEL(task_label_description)));
+  gtk_label_set_markup(GTK_LABEL(last_task_label_description), last_task_markup);
+
   char *code_markup;
   const gchar* code_format = "<span font=\"30\"><b>%s</b></span>";
   code_markup = g_markup_printf_escaped(code_format, code);
@@ -86,6 +93,7 @@ void set_current_task(const gchar* code, const gchar* description)
   description_markup = g_markup_printf_escaped(description_format, description);
   gtk_label_set_markup(GTK_LABEL(task_label_description), description_markup);
 
+  g_free(last_task_markup);
   g_free(code_markup);
   g_free(description_markup);
 }

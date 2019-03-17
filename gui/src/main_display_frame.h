@@ -8,5 +8,6 @@ GtkWidget *main_display_frame;
 GtkWidget* build_main_display_frame();
 
 void set_check_in(guint value);
+void set_current_task(const gchar* code, const gchar* description);
 
 #endif
