@@ -27,7 +27,7 @@ fn main() -> Result<()> {
                 let mut reader = BufReader::new(&stream);
                 let mut response = String::new();
                 reader.read_line(&mut response).expect("could not read");
-                println!("Server response: {}", response);
+                print!("Server response: {}", response);
             }
         },
         Err(e) => {

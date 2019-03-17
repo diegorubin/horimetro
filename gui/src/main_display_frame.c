@@ -9,11 +9,16 @@ GtkWidget *timer_label_end;
 GtkWidget *timer_progress;
 GtkWidget *timer_label_elapsed;
 
+GtkWidget *task_label_code;
+GtkWidget *task_label_description;
+GtkWidget *last_task_label_description;
+
 GtkWidget* build_main_display_frame()
 {
   GtkWidget *main_box;
   GtkWidget *timer_box;
   GtkWidget *tasks_box;
+  GtkWidget *current_tasks_box;
 
   GtkWidget *timer_label_init_description;
   GtkWidget *timer_label_end_description;
@@ -54,7 +59,35 @@ GtkWidget* build_main_display_frame()
   gtk_label_set_markup(GTK_LABEL(timer_label_elapsed), "<span font=\"50\"><b>00:00</b></span>");
   gtk_box_pack_start(GTK_BOX(tasks_box), timer_label_elapsed, FALSE, TRUE, 0);
 
+  current_tasks_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+  gtk_box_pack_start(GTK_BOX(tasks_box), current_tasks_box, TRUE, TRUE, 0);
+
+  task_label_code = gtk_label_new("");
+  gtk_box_pack_start(GTK_BOX(current_tasks_box), task_label_code, TRUE, TRUE, 0);
+
+  task_label_description = gtk_label_new("");
+  gtk_box_pack_start(GTK_BOX(current_tasks_box), task_label_description, TRUE, TRUE, 0);
+
+  last_task_label_description = gtk_label_new("");
+  gtk_box_pack_start(GTK_BOX(current_tasks_box), last_task_label_description, TRUE, FALSE, 0);
+
   return main_display_frame;
+}
+
+void set_current_task(const gchar* code, const gchar* description)
+{
+  char *code_markup;
+  const gchar* code_format = "<span font=\"30\"><b>%s</b></span>";
+  code_markup = g_markup_printf_escaped(code_format, code);
+  gtk_label_set_markup(GTK_LABEL(task_label_code), code_markup);
+
+  char *description_markup;
+  const gchar* description_format = "<span font=\"20\"><b>%s</b></span>";
+  description_markup = g_markup_printf_escaped(description_format, description);
+  gtk_label_set_markup(GTK_LABEL(task_label_description), description_markup);
+
+  g_free(code_markup);
+  g_free(description_markup);
 }
 
 gboolean update_elapsed_time(gpointer data)

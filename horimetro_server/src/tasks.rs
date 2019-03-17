@@ -1,7 +1,5 @@
 use chrono::prelude::*;
 use std::fs::OpenOptions;
-
-
 use std::io::prelude::*;
 
 struct Task {
@@ -11,30 +9,37 @@ struct Task {
     ended_in: i32,
 }
 
-fn generate_key() {
+fn generate_key() -> String {
     let date: DateTime<Utc> = Utc::now();
     date.format("%Y-%m-%d").to_string()
 }
 
-pub fn create_task(task: String) {
-    let key = generate_key();
-    create_task_with_key(key, task);
+fn get_current_time() -> u32 {
+    let date: DateTime<Local> = Local::now();
+    date.minute() + date.hour() * 60
 }
 
-pub fn create_task_with_key(key: String, task: String) {
-    let filename = format!("~/.horimetro/tasks/{}.lht", key);
-    let mut file = OpenOptions::new()
-            .append(true)
-            .create(true);
+pub fn create_task(code: String, task: String) {
+    let key = generate_key();
+    create_task_with_key(key, code, task);
+}
 
-    match file.open(filanem) {
+pub fn create_task_with_key(key: String, code: String, task: String) {
+    let filename = format!("/var/lib/horimetro/tasks/{}.lht", key);
+    let mut file = OpenOptions::new();
+    file.append(true);
+    file.create(true);
+
+    println!("opening file: {}", filename);
+    match file.open(filename) {
         Err(e) => {
-            eprintln!("error in open file {}: {}", filename, e);
+            eprintln!("error in open file: {}", e);
         }
         Ok(mut f) => {
-            if let Err(e) = writeln!(file, format!("({}, {}, 0, 0)", key, task)) {
-                eprintln!("Couldn't write to file {}: {}", filename, e);
+            if let Err(e) = writeln!(f, "('{}', '{}', {}, 0)", code, task, get_current_time()) {
+                eprintln!("Couldn't write to file: {}", e);
             }
+            f.sync_all().expect("could not sync file");
         }
     }
 }

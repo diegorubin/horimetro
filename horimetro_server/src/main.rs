@@ -4,6 +4,7 @@ use std::io::Result;
 use std::thread;
 
 mod dbus_client;
+mod tasks;
 
 fn read_command(stream: &TcpStream) -> String {
     let mut reader = BufReader::new(stream);
@@ -27,15 +28,21 @@ fn handle_client(stream: TcpStream) {
     let command: &str = &main_command.trim();
     match command {
         "AddCommand" => {
-            let raw_message = read_command(&stream);
-            dbus_client::add_command(raw_message);
+            dbus_client::add_command(read_command(&stream));
+        },
+        "CheckIn" => {
+            dbus_client::check_in(read_command(&stream).trim().to_string());
+        },
+        "CreateTask" => {
+            let code = read_command(&stream).trim().to_string();
+            write_response(&stream, "received code\n");
+
+            let description = read_command(&stream).trim().to_string();
+
+            tasks::create_task(code, description);
         },
         "ShowNextFrame" => {
             dbus_client::show_next_frame();
-        },
-        "CheckIn" => {
-            let raw_message = read_command(&stream);
-            dbus_client::check_in(raw_message.trim().to_string());
         },
         _ => {
             println!("command not found!");
