@@ -127,7 +127,7 @@ gboolean update_elapsed_time(gpointer data)
   return TRUE;
 }
 
-void set_check_in(guint value)
+void set_check_in(guint value, guint elapsed_in_check_in)
 {
   char *check_in_markup;
   char *check_out_markup;
@@ -148,7 +148,10 @@ void set_check_in(guint value)
 
   gtk_label_set_markup(GTK_LABEL(timer_label_init), check_in_markup);
   gtk_label_set_markup(GTK_LABEL(timer_label_end), check_out_markup);
+  
+  elapsed = elapsed_in_check_in - 1;
 
+  update_elapsed_time(NULL);
   g_timeout_add(60000, update_elapsed_time, NULL);
 
   g_free(check_in_markup);
