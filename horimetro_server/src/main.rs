@@ -39,7 +39,8 @@ fn handle_client(stream: TcpStream) {
 
             let description = read_command(&stream).trim().to_string();
 
-            tasks::create_task(code, description);
+            tasks::create_task(code.to_owned(), description.to_owned());
+            dbus_client::set_current_task(code, description);
         },
         "ShowNextFrame" => {
             dbus_client::show_next_frame();

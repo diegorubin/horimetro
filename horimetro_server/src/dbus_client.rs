@@ -12,6 +12,13 @@ pub fn add_command(command: String) {
     c.send_with_reply_and_block(m, 2000).unwrap();
 }
 
+pub fn set_current_task(code: String, description: String) {
+    let c = Connection::get_private(BusType::Session).unwrap();
+    let m = Message::new_method_call(SERVICE, PATH, INTERFACE, "SetCurrentTask").unwrap()
+        .append1(code).append1(description);
+    c.send_with_reply_and_block(m, 2000).unwrap();
+}
+
 pub fn show_next_frame() {
     let c = Connection::get_private(BusType::Session).unwrap();
     let m = Message::new_method_call(SERVICE, PATH, INTERFACE, "ShowNextFrame").unwrap();
