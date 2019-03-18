@@ -1,3 +1,6 @@
+#[macro_use]
+extern crate serde_derive;
+
 use std::net::{TcpListener, TcpStream};
 use std::io::{BufReader, BufWriter, Write, BufRead};
 use std::io::Result;
@@ -41,6 +44,16 @@ fn handle_client(stream: TcpStream) {
 
             tasks::create_task(code.to_owned(), description.to_owned());
             dbus_client::set_current_task(code, description);
+        },
+        "CloseCurrentTask" => {
+            match tasks::close_current_task() {
+                Ok(_) => {
+                    dbus_client::set_current_task("".to_string(), "".to_string());
+                },
+                _ => {
+                    println!("not have current task to close");
+                }
+            }
         },
         "ShowNextFrame" => {
             dbus_client::show_next_frame();

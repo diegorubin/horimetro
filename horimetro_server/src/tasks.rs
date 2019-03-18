@@ -1,12 +1,106 @@
 use chrono::prelude::*;
 use std::fs::OpenOptions;
 use std::io::prelude::*;
+use std::io::{BufRead, BufReader, Result};
 
+#[derive(Serialize, Deserialize)]
 struct Task {
     code: String,
     description: String,
-    initied_in: i32,
-    ended_in: i32,
+    initied_in: u32,
+    ended_in: u32,
+}
+
+pub fn create_task(code: String, task: String) {
+    let key = generate_key();
+    create_task_with_key(key, code, task);
+}
+
+pub fn create_task_with_key(key: String, code: String, task: String) {
+    let filename = get_filename(key);
+    let mut file = OpenOptions::new();
+    file.append(true);
+    file.create(true);
+
+    println!("opening file: {}", filename);
+    match file.open(filename) {
+        Err(e) => {
+            eprintln!("error in open file: {}", e);
+        }
+        Ok(mut f) => {
+            let task = Task {
+                code: code,
+                description: task,
+                initied_in: get_current_time(),
+                ended_in: 0
+            };
+            let content = serde_json::to_string(&task).unwrap();
+            if let Err(e) = writeln!(f, "{}", content) {
+                eprintln!("Couldn't write to file: {}", e);
+            }
+            f.sync_all().expect("could not sync file");
+        }
+    }
+}
+
+pub fn close_current_task() -> Result<()> {
+    let key = generate_key();
+    let tasks = get_current_tasks(key.to_owned());
+    let changed_tasks = tasks.into_iter().map(|mut task| {
+        if task.ended_in == 0 {
+            task.ended_in = get_current_time();
+        }
+        task
+    })
+    .rev().collect();
+    update_tasks_file(key, changed_tasks)
+}
+
+fn update_tasks_file(key: String, tasks: Vec<Task>) -> Result<()> {
+    let filename = get_filename(key);
+    let mut file = OpenOptions::new();
+    file.write(true);
+    file.create(true);
+
+    match file.open(filename) {
+        Err(e) => {
+            eprintln!("error in open file for update: {}", e);
+        }
+        Ok(mut f) => {
+            for task in tasks {
+                let content = serde_json::to_string(&task).unwrap();
+                if let Err(e) = writeln!(f, "{}", content) {
+                    return Err(e)
+                }
+            }
+            f.sync_all().expect("could not sync file");
+        }
+    }
+    Ok(())
+}
+
+fn get_current_tasks(key: String) -> Vec<Task> {
+    let filename = get_filename(key);
+    let mut tasks = Vec::new();
+    let mut file = OpenOptions::new();
+    file.read(true);
+
+    match file.open(filename) {
+        Err(e) => {
+            eprintln!("error in open file to read: {}", e);
+        }
+        Ok(f) => {
+            for line in BufReader::new(f).lines() {
+                let task: Task = serde_json::from_str(&line.unwrap()).unwrap();
+                tasks.push(task);
+            }
+        }
+    }
+    tasks
+}
+
+fn get_filename(key: String) -> String {
+    format!("/var/lib/horimetro/tasks/{}.lht", key)
 }
 
 fn generate_key() -> String {
@@ -19,27 +113,3 @@ fn get_current_time() -> u32 {
     date.minute() + date.hour() * 60
 }
 
-pub fn create_task(code: String, task: String) {
-    let key = generate_key();
-    create_task_with_key(key, code, task);
-}
-
-pub fn create_task_with_key(key: String, code: String, task: String) {
-    let filename = format!("/var/lib/horimetro/tasks/{}.lht", key);
-    let mut file = OpenOptions::new();
-    file.append(true);
-    file.create(true);
-
-    println!("opening file: {}", filename);
-    match file.open(filename) {
-        Err(e) => {
-            eprintln!("error in open file: {}", e);
-        }
-        Ok(mut f) => {
-            if let Err(e) = writeln!(f, "('{}', '{}', {}, 0)", code, task, get_current_time()) {
-                eprintln!("Couldn't write to file: {}", e);
-            }
-            f.sync_all().expect("could not sync file");
-        }
-    }
-}
