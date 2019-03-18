@@ -66,10 +66,12 @@ GtkWidget* build_main_display_frame()
   gtk_box_pack_start(GTK_BOX(current_tasks_box), task_label_code, TRUE, TRUE, 0);
 
   task_label_description = gtk_label_new("");
+  gtk_label_set_line_wrap(GTK_LABEL(task_label_description), TRUE);
   gtk_box_pack_start(GTK_BOX(current_tasks_box), task_label_description, TRUE, TRUE, 0);
 
   last_task_label_description = gtk_label_new("");
-  gtk_box_pack_start(GTK_BOX(current_tasks_box), last_task_label_description, TRUE, FALSE, 0);
+  gtk_label_set_line_wrap(GTK_LABEL(last_task_label_description), TRUE);
+  gtk_box_pack_start(GTK_BOX(current_tasks_box), last_task_label_description, TRUE, TRUE, 10);
 
   return main_display_frame;
 }
@@ -84,12 +86,12 @@ void set_current_task(const gchar* code, const gchar* description)
   gtk_label_set_markup(GTK_LABEL(last_task_label_description), last_task_markup);
 
   char *code_markup;
-  const gchar* code_format = "<span font=\"30\"><b>%s</b></span>";
+  const gchar* code_format = "<span font=\"20\"><b>%s</b></span>";
   code_markup = g_markup_printf_escaped(code_format, code);
   gtk_label_set_markup(GTK_LABEL(task_label_code), code_markup);
 
   char *description_markup;
-  const gchar* description_format = "<span font=\"20\"><b>%s</b></span>";
+  const gchar* description_format = "<span font=\"10\"><b>%s</b></span>";
   description_markup = g_markup_printf_escaped(description_format, description);
   gtk_label_set_markup(GTK_LABEL(task_label_description), description_markup);
 
