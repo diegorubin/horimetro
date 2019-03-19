@@ -58,6 +58,8 @@ fn handle_client(stream: TcpStream) {
             }
         },
         "Report" => {
+            dbus_client::clear_tasks();
+
             let date: DateTime<Local> = Local::now();
             let yesterday = date - Duration::days(1);
     

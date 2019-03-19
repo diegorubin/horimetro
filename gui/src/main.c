@@ -24,6 +24,9 @@ static const gchar introspection_xml[] =
 "      <arg type='s' name='total' direction='in'/>"              
 "      <arg type='s' name='result' direction='out'/>"              
 "    </method>"                               
+"    <method name='ClearTasks'>"                      
+"      <arg type='s' name='result' direction='out'/>"              
+"    </method>"                               
 "    <method name='SetCurrentTask'>"                      
 "      <arg type='s' name='code' direction='in'/>"              
 "      <arg type='s' name='description' direction='in'/>"              
@@ -91,6 +94,14 @@ void method_handler(GDBusConnection *conn,
 
   if (!g_strcmp0(method_name, "ShowNextFrame")) {
     show_next_frame();
+
+    g_dbus_method_invocation_return_value(invocation,
+                    g_variant_new("(s)", "ok"));
+    return;
+  }
+
+  if (!g_strcmp0(method_name, "ClearTasks")) {
+    clear_tasks();
 
     g_dbus_method_invocation_return_value(invocation,
                     g_variant_new("(s)", "ok"));

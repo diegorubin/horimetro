@@ -8,5 +8,6 @@ GtkWidget *tasks_frame;
 GtkWidget* build_tasks_frame();
 void add_task(const gchar *date, const gchar *description, 
   const gchar *init, const gchar *total);
+void clear_tasks();
 
 #endif

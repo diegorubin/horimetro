@@ -19,6 +19,12 @@ pub fn add_task(date: String, description: String, init: String, total: String) 
     c.send_with_reply_and_block(m, 2000).unwrap();
 }
 
+pub fn clear_tasks() {
+    let c = Connection::get_private(BusType::Session).unwrap();
+    let m = Message::new_method_call(SERVICE, PATH, INTERFACE, "ClearTasks").unwrap();
+    c.send_with_reply_and_block(m, 2000).unwrap();
+}
+
 pub fn set_current_task(code: String, description: String) {
     let c = Connection::get_private(BusType::Session).unwrap();
     let m = Message::new_method_call(SERVICE, PATH, INTERFACE, "SetCurrentTask").unwrap()

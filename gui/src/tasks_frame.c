@@ -52,6 +52,14 @@ void add_task(const gchar *date, const gchar *description,
     -1);
 }
 
+void clear_tasks()
+{
+  GtkListStore *store;
+  store = GTK_LIST_STORE(gtk_tree_view_get_model
+      (GTK_TREE_VIEW(tasks_list)));
+  gtk_list_store_clear(store);
+}
+
 GtkWidget* build_tasks_frame()
 {
   GtkWidget *scrolled_window = gtk_scrolled_window_new(NULL, NULL);
