@@ -2,6 +2,7 @@
 #include <glib.h>
 #include <gio/gio.h>
 
+#include "tasks_frame.h"
 #include "last_command_frame.h"
 #include "window.h"
 
@@ -14,6 +15,13 @@ static const gchar introspection_xml[] =
 "  <interface name='com.diegorubin.horimetro.Gui'>"              
 "    <method name='AddLastCommand'>"                      
 "      <arg type='s' name='command' direction='in'/>"              
+"      <arg type='s' name='result' direction='out'/>"              
+"    </method>"                               
+"    <method name='AppendTask'>"                      
+"      <arg type='s' name='date' direction='in'/>"              
+"      <arg type='s' name='description' direction='in'/>"              
+"      <arg type='s' name='init' direction='in'/>"              
+"      <arg type='s' name='total' direction='in'/>"              
 "      <arg type='s' name='result' direction='out'/>"              
 "    </method>"                               
 "    <method name='SetCurrentTask'>"                      
@@ -50,6 +58,21 @@ void method_handler(GDBusConnection *conn,
 
     g_dbus_method_invocation_return_value(invocation,
                     g_variant_new("(s)", command));
+    return;
+  }
+
+  if (!g_strcmp0(method_name, "AppendTask")) {
+    const gchar* date;
+    const gchar* description;
+    const gchar* init;
+    const gchar* total;
+
+    g_variant_get(parameters, "(ssss)", &date, &description, &init, &total);
+
+    add_task(date, description, init, total);
+
+    g_dbus_method_invocation_return_value(invocation,
+                    g_variant_new("(s)", "ok"));
     return;
   }
 

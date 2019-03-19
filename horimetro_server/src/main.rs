@@ -55,6 +55,8 @@ fn handle_client(stream: TcpStream) {
                 }
             }
         },
+        "Report" => {
+        },
         "ShowNextFrame" => {
             dbus_client::show_next_frame();
         },

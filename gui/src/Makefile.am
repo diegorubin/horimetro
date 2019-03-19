@@ -7,6 +7,7 @@ AM_CPPFLAGS = ${horimetro_CFLAGS}
 bin_PROGRAMS = horimetro
 
 horimetro_SOURCES = last_command_frame.c \
+                    tasks_frame.c \
                     main_display_frame.c \
 										window.c \
                     main.c
