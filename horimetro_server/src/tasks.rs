@@ -45,7 +45,7 @@ pub fn create_task_with_key(key: String, code: String, task: String) {
 
 pub fn close_current_task() -> Result<()> {
     let key = generate_key();
-    let tasks = get_current_tasks(key.to_owned());
+    let tasks = get_tasks(key.to_owned());
     let changed_tasks = tasks.into_iter().map(|mut task| {
         if task.ended_in == 0 {
             task.ended_in = get_current_time();
@@ -79,7 +79,30 @@ fn update_tasks_file(key: String, tasks: Vec<Task>) -> Result<()> {
     Ok(())
 }
 
-fn get_current_tasks(key: String) -> Vec<Task> {
+pub fn report(key: String) -> Vec<(std::string::String, std::string::String, std::string::String, std::string::String)> {
+    let mut tasks = Vec::new();
+    for task in get_tasks(key.to_owned()) {
+        let mut total: String;
+        if task.ended_in == 0 {
+            total = "opened".to_string();
+        } else {
+            total = format!("{}", task.ended_in - task.initied_in).to_string();
+        }
+        tasks.push((
+            key.to_owned(),
+            format!("{} - {}", task.code, task.description),
+            to_hour(task.initied_in),
+            total
+        ));
+    }
+    tasks
+}
+
+fn to_hour(value: u32) -> String {
+    format!("{}:{}", value / 60, value % 60).to_string()
+}
+
+fn get_tasks(key: String) -> Vec<Task> {
     let filename = get_filename(key);
     let mut tasks = Vec::new();
     let mut file = OpenOptions::new();
@@ -104,7 +127,7 @@ fn get_filename(key: String) -> String {
 }
 
 fn generate_key() -> String {
-    let date: DateTime<Utc> = Utc::now();
+    let date: DateTime<Local> = Local::now();
     date.format("%Y-%m-%d").to_string()
 }
 

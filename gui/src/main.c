@@ -17,7 +17,7 @@ static const gchar introspection_xml[] =
 "      <arg type='s' name='command' direction='in'/>"              
 "      <arg type='s' name='result' direction='out'/>"              
 "    </method>"                               
-"    <method name='AppendTask'>"                      
+"    <method name='AddTask'>"                      
 "      <arg type='s' name='date' direction='in'/>"              
 "      <arg type='s' name='description' direction='in'/>"              
 "      <arg type='s' name='init' direction='in'/>"              
@@ -61,7 +61,7 @@ void method_handler(GDBusConnection *conn,
     return;
   }
 
-  if (!g_strcmp0(method_name, "AppendTask")) {
+  if (!g_strcmp0(method_name, "AddTask")) {
     const gchar* date;
     const gchar* description;
     const gchar* init;

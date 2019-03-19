@@ -1,10 +1,12 @@
 #[macro_use]
 extern crate serde_derive;
 
+use chrono::prelude::*;
 use std::net::{TcpListener, TcpStream};
 use std::io::{BufReader, BufWriter, Write, BufRead};
 use std::io::Result;
 use std::thread;
+use time::Duration;
 
 mod dbus_client;
 mod tasks;
@@ -56,6 +58,16 @@ fn handle_client(stream: TcpStream) {
             }
         },
         "Report" => {
+            let date: DateTime<Local> = Local::now();
+            let yesterday = date - Duration::days(1);
+    
+            for task in tasks::report(yesterday.format("%Y-%m-%d").to_string()) {
+                dbus_client::add_task(task.0, task.1, task.2, task.3);
+            }
+
+            for task in tasks::report(date.format("%Y-%m-%d").to_string()) {
+                dbus_client::add_task(task.0, task.1, task.2, task.3);
+            }
         },
         "ShowNextFrame" => {
             dbus_client::show_next_frame();
