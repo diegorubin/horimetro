@@ -3,7 +3,7 @@ use std::fs::OpenOptions;
 use std::io::prelude::*;
 use std::io::{BufRead, BufReader, Result};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 struct Task {
     code: String,
     description: String,
@@ -65,11 +65,25 @@ pub fn close_current_task() -> Result<()> {
     update_tasks_file(key, changed_tasks)
 }
 
+pub fn remove_task(key: String, code: String, description: String, initied_in: u32) -> Result<()> {
+    let mut tasks = Vec::new();
+    for task in get_tasks(key.to_owned()) {
+        if !(task.code == code && task.description == description && task.initied_in == initied_in) {
+            tasks.push(task);
+        } else {
+            println!("removing task {:#?}", task);
+        }
+    }
+    println!("before update {:?}", tasks);
+    update_tasks_file(key.to_owned(), tasks)
+}
+
 fn update_tasks_file(key: String, tasks: Vec<Task>) -> Result<()> {
     let filename = get_filename(key);
     let mut file = OpenOptions::new();
     file.write(true);
     file.create(true);
+    file.truncate(true);
 
     match file.open(filename) {
         Err(e) => {

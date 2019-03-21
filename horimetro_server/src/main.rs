@@ -16,6 +16,12 @@ fn from_hour(hour: String) -> u32 {
     values[0].parse::<u32>().unwrap() * 60 + values[1].parse::<u32>().unwrap()
 }
 
+fn write_response(stream: &TcpStream, response: &str) {
+    let mut writer = BufWriter::new(stream);
+    writer.write_all(response.as_bytes()).expect("could not write");
+    writer.flush().expect("could not flush");
+}
+
 fn read_command(stream: &TcpStream) -> String {
     let mut reader = BufReader::new(stream);
     let mut raw_message = String::new();
@@ -24,10 +30,20 @@ fn read_command(stream: &TcpStream) -> String {
     raw_message
 }
 
-fn write_response(stream: &TcpStream, response: &str) {
-    let mut writer = BufWriter::new(stream);
-    writer.write_all(response.as_bytes()).expect("could not write");
-    writer.flush().expect("could not flush");
+fn read_complete_task(stream: &TcpStream) -> (String, String, String, u32) {
+    let key = read_command(&stream).trim().to_string();
+    write_response(&stream, "received key\n");
+
+    let code = read_command(&stream).trim().to_string();
+    write_response(&stream, "received code\n");
+
+    let description = read_command(&stream).trim().to_string();
+    write_response(&stream, "received description\n");
+
+    let initied_in = from_hour(read_command(&stream).trim().to_string());
+    write_response(&stream, "received initied_in\n");
+
+    (key, code, description, initied_in)
 }
 
 fn get_report_days() -> Vec<String> {
@@ -82,6 +98,10 @@ fn handle_client(stream: TcpStream) {
                 }
             }
         },
+        "RemoveTask" => {
+            let task = read_complete_task(&stream);
+            tasks::remove_task(task.0, task.1, task.2, task.3).expect("error on remove task");
+        },
         "Report" => {
             gui::clear_tasks();
 
@@ -95,19 +115,8 @@ fn handle_client(stream: TcpStream) {
             gui::show_next_frame();
         },
         "TaskExists" => {
-            let key = read_command(&stream).trim().to_string();
-            write_response(&stream, "received key\n");
-
-            let code = read_command(&stream).trim().to_string();
-            write_response(&stream, "received code\n");
-
-            let description = read_command(&stream).trim().to_string();
-            write_response(&stream, "received description\n");
-
-            let initied_in = from_hour(read_command(&stream).trim().to_string());
-            write_response(&stream, "received initied_in\n");
-
-            match tasks::task_exists(key, code, description, initied_in) {
+            let task = read_complete_task(&stream);
+            match tasks::task_exists(task.0, task.1, task.2, task.3) {
                 true => write_response(&stream, "found"),
                 _ => write_response(&stream, "not found")
             }
