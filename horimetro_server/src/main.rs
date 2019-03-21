@@ -80,6 +80,8 @@ fn handle_client(stream: TcpStream) {
             gui::check_in(value);
         },
         "CreateTask" => {
+            tasks::close_current_task().expect("error on close task");
+
             let code = read_command(&stream).trim().to_string();
             write_response(&stream, "received code\n");
 
