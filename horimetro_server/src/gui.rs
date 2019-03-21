@@ -38,11 +38,8 @@ pub fn show_next_frame() {
     c.send_with_reply_and_block(m, 2000).unwrap();
 }
 
-pub fn check_in(hour: String) -> u32 {
+pub fn check_in(value: u32) -> u32 {
     let date: DateTime<Local> = Local::now();
-    let values = hour.split(":").collect::<Vec<&str>>();
-    println!("{:?}", values);
-    let value: u32 = values[0].parse::<u32>().unwrap() * 60 + values[1].parse::<u32>().unwrap();
     let elapsed: u32 = (date.minute() + date.hour() * 60) - value;
     let c = Connection::get_private(BusType::Session).unwrap();
     let m = Message::new_method_call(SERVICE, PATH, INTERFACE, "CheckIn").unwrap()

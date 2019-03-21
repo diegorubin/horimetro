@@ -14,17 +14,17 @@ void build_list(GtkWidget *list)
           renderer, "text", 0, NULL);
   gtk_tree_view_append_column(GTK_TREE_VIEW(list), date_column);
 
-  GtkTreeViewColumn *description_column = gtk_tree_view_column_new_with_attributes("Tarefa",
-          renderer, "text", 1, NULL);
-  gtk_tree_view_append_column(GTK_TREE_VIEW(list), description_column);
-
   GtkTreeViewColumn *init_column = gtk_tree_view_column_new_with_attributes("Início",
-          renderer, "text", 2, NULL);
+          renderer, "text", 1, NULL);
   gtk_tree_view_append_column(GTK_TREE_VIEW(list), init_column);
 
   GtkTreeViewColumn *total_column = gtk_tree_view_column_new_with_attributes("Tempo Gasto",
-          renderer, "text", 3, NULL);
+          renderer, "text", 2, NULL);
   gtk_tree_view_append_column(GTK_TREE_VIEW(list), total_column);
+
+  GtkTreeViewColumn *description_column = gtk_tree_view_column_new_with_attributes("Tarefa",
+          renderer, "text", 3, NULL);
+  gtk_tree_view_append_column(GTK_TREE_VIEW(list), description_column);
 
   store = gtk_list_store_new(4, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
 
@@ -46,9 +46,9 @@ void add_task(const gchar *date, const gchar *description,
   gtk_list_store_append(store, &iter);
   gtk_list_store_set(store, &iter, 
     0, date, 
-    1, description, 
-    2, init, 
-    3, total, 
+    1, init, 
+    2, total, 
+    3, description, 
     -1);
 }
 

@@ -8,8 +8,13 @@ use std::io::Result;
 use std::thread;
 use time::Duration;
 
-mod dbus_client;
+mod gui;
 mod tasks;
+
+fn from_hour(hour: String) -> u32 {
+    let values = hour.split(":").collect::<Vec<&str>>();
+    values[0].parse::<u32>().unwrap() * 60 + values[1].parse::<u32>().unwrap()
+}
 
 fn read_command(stream: &TcpStream) -> String {
     let mut reader = BufReader::new(stream);
@@ -25,6 +30,25 @@ fn write_response(stream: &TcpStream, response: &str) {
     writer.flush().expect("could not flush");
 }
 
+fn get_report_days() -> Vec<String> {
+    let dateformat = "%Y-%m-%d";
+
+    let date: DateTime<Local> = Local::now();
+    let last_work_day = match date.weekday() {
+        Weekday::Fri => 3,
+        _ => 1
+    };
+
+    let yesterday = date - Duration::days(last_work_day);
+
+    let mut days = Vec::new();
+
+    days.push(yesterday.format(dateformat).to_string());
+    days.push(date.format(dateformat).to_string());
+
+    days
+}
+
 fn handle_client(stream: TcpStream) {
 
     let main_command = read_command(&stream);
@@ -33,10 +57,11 @@ fn handle_client(stream: TcpStream) {
     let command: &str = &main_command.trim();
     match command {
         "AddCommand" => {
-            dbus_client::add_command(read_command(&stream));
+            gui::add_command(read_command(&stream));
         },
         "CheckIn" => {
-            dbus_client::check_in(read_command(&stream).trim().to_string());
+            let value = from_hour(read_command(&stream).trim().to_string());
+            gui::check_in(value);
         },
         "CreateTask" => {
             let code = read_command(&stream).trim().to_string();
@@ -45,12 +70,12 @@ fn handle_client(stream: TcpStream) {
             let description = read_command(&stream).trim().to_string();
 
             tasks::create_task(code.to_owned(), description.to_owned());
-            dbus_client::set_current_task(code, description);
+            gui::set_current_task(code, description);
         },
         "CloseCurrentTask" => {
             match tasks::close_current_task() {
                 Ok(_) => {
-                    dbus_client::set_current_task("".to_string(), "".to_string());
+                    gui::set_current_task("".to_string(), "".to_string());
                 },
                 _ => {
                     println!("not have current task to close");
@@ -58,21 +83,34 @@ fn handle_client(stream: TcpStream) {
             }
         },
         "Report" => {
-            dbus_client::clear_tasks();
+            gui::clear_tasks();
 
-            let date: DateTime<Local> = Local::now();
-            let yesterday = date - Duration::days(1);
-    
-            for task in tasks::report(yesterday.format("%Y-%m-%d").to_string()) {
-                dbus_client::add_task(task.0, task.1, task.2, task.3);
-            }
-
-            for task in tasks::report(date.format("%Y-%m-%d").to_string()) {
-                dbus_client::add_task(task.0, task.1, task.2, task.3);
+            for day in get_report_days() {
+                for task in tasks::report(day) {
+                    gui::add_task(task.0, task.1, task.2, task.3);
+                }
             }
         },
         "ShowNextFrame" => {
-            dbus_client::show_next_frame();
+            gui::show_next_frame();
+        },
+        "TaskExists" => {
+            let key = read_command(&stream).trim().to_string();
+            write_response(&stream, "received key\n");
+
+            let code = read_command(&stream).trim().to_string();
+            write_response(&stream, "received code\n");
+
+            let description = read_command(&stream).trim().to_string();
+            write_response(&stream, "received description\n");
+
+            let initied_in = from_hour(read_command(&stream).trim().to_string());
+            write_response(&stream, "received initied_in\n");
+
+            match tasks::task_exists(key, code, description, initied_in) {
+                true => write_response(&stream, "found"),
+                _ => write_response(&stream, "not found")
+            }
         },
         _ => {
             println!("command not found!");
@@ -80,7 +118,7 @@ fn handle_client(stream: TcpStream) {
     }
 
     let mut writer = BufWriter::new(&stream);
-    writer.write_all("to client\n".as_bytes()).expect("Could not write");
+    writer.write_all("\n".as_bytes()).expect("Could not write");
 }
 
 fn main() -> Result<()> {

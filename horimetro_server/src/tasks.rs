@@ -13,10 +13,19 @@ struct Task {
 
 pub fn create_task(code: String, task: String) {
     let key = generate_key();
-    create_task_with_key(key, code, task);
+    create_task_with_key(key, code, task, get_current_time());
 }
 
-pub fn create_task_with_key(key: String, code: String, task: String) {
+pub fn task_exists(key: String, code: String, description: String, initied_in: u32) -> bool {
+    for task in get_tasks(key.to_owned()) {
+        if task.code == code && task.description == description && task.initied_in == initied_in {
+            return true;
+        }
+    }
+    false
+}
+
+pub fn create_task_with_key(key: String, code: String, task: String, initied_in: u32) {
     let filename = get_filename(key);
     let mut file = OpenOptions::new();
     file.append(true);
@@ -31,7 +40,7 @@ pub fn create_task_with_key(key: String, code: String, task: String) {
             let task = Task {
                 code: code,
                 description: task,
-                initied_in: get_current_time(),
+                initied_in: initied_in,
                 ended_in: 0
             };
             let content = serde_json::to_string(&task).unwrap();
@@ -99,7 +108,7 @@ pub fn report(key: String) -> Vec<(std::string::String, std::string::String, std
 }
 
 fn to_hour(value: u32) -> String {
-    format!("{}:{}", value / 60, value % 60).to_string()
+    format!("{:02}:{:02}", value / 60, value % 60).to_string()
 }
 
 fn get_tasks(key: String) -> Vec<Task> {
@@ -110,7 +119,7 @@ fn get_tasks(key: String) -> Vec<Task> {
 
     match file.open(filename) {
         Err(e) => {
-            eprintln!("error in open file to read: {}", e);
+            eprintln!("warning: error in open file to read: {}", e);
         }
         Ok(f) => {
             for line in BufReader::new(f).lines() {
