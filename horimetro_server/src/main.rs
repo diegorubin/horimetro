@@ -86,9 +86,25 @@ fn handle_client(stream: TcpStream) {
             write_response(&stream, "received code\n");
 
             let description = read_command(&stream).trim().to_string();
+            write_response(&stream, "received description\n");
 
             tasks::create_task(code.to_owned(), description.to_owned());
             gui::set_current_task(code, description);
+            write_response(&stream, "task created!");
+        },
+        "CreateInLineTask" => {
+            tasks::close_current_task().expect("error on close task");
+
+            let inline = read_command(&stream).trim().to_string();
+            write_response(&stream, "received complete task\n");
+
+            let values = inline.split(":").collect::<Vec<&str>>();
+            let code = values[0].to_string();
+            let description = values[1].to_string();
+
+            tasks::create_task(code.to_owned(), description.to_owned());
+            gui::set_current_task(code, description);
+            write_response(&stream, "task created!");
         },
         "CloseCurrentTask" => {
             match tasks::close_current_task() {
