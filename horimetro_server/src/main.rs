@@ -51,7 +51,7 @@ fn get_report_days() -> Vec<String> {
 
     let date: DateTime<Local> = Local::now();
     let last_work_day = match date.weekday() {
-        Weekday::Fri => 3,
+        Weekday::Mon => 3,
         _ => 1
     };
 
