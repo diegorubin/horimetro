@@ -59,8 +59,8 @@ fn get_report_days() -> Vec<String> {
 
     let mut days = Vec::new();
 
-    days.push(yesterday.format(dateformat).to_string());
     days.push(date.format(dateformat).to_string());
+    days.push(yesterday.format(dateformat).to_string());
 
     days
 }

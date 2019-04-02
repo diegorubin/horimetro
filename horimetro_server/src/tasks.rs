@@ -106,7 +106,7 @@ pub fn report(key: String) -> Vec<(std::string::String, std::string::String,
   std::string::String, std::string::String)> {
     let mut tasks = Vec::new();
     let mut tasks_list = get_tasks(key.to_owned());
-    tasks_list.sort_by(|a, b| a.initied_in.cmp(&b.initied_in));
+    tasks_list.sort_by(|a, b| b.initied_in.cmp(&a.initied_in));
 
     for task in tasks_list {
         let mut total: String;
