@@ -102,9 +102,13 @@ fn update_tasks_file(key: String, tasks: Vec<Task>) -> Result<()> {
     Ok(())
 }
 
-pub fn report(key: String) -> Vec<(std::string::String, std::string::String, std::string::String, std::string::String)> {
+pub fn report(key: String) -> Vec<(std::string::String, std::string::String, 
+  std::string::String, std::string::String)> {
     let mut tasks = Vec::new();
-    for task in get_tasks(key.to_owned()) {
+    let mut tasks_list = get_tasks(key.to_owned());
+    tasks_list.sort_by(|a, b| a.initied_in.cmp(&b.initied_in));
+
+    for task in tasks_list {
         let mut total: String;
         if task.ended_in == 0 {
             total = "opened".to_string();
