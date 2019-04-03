@@ -79,6 +79,15 @@ fn handle_client(stream: TcpStream) {
             let value = from_hour(read_command(&stream).trim().to_string());
             gui::check_in(value);
         },
+        "CheckInWithCheckOut" => {
+            let check_in = from_hour(read_command(&stream).trim().to_string());
+            write_response(&stream, "received checkin\n");
+
+            let check_out = from_hour(read_command(&stream).trim().to_string());
+            write_response(&stream, "received checkout\n");
+
+            gui::check_in_with_check_out(check_in, check_out);
+        },
         "CreateTask" => {
             tasks::close_current_task().expect("error on close task");
 

@@ -1,5 +1,7 @@
 #include "main_display_frame.h"
 
+int running = 0;
+
 guint check_in = 0;
 guint check_out = 0;
 gfloat elapsed = 0;
@@ -12,6 +14,8 @@ GtkWidget *timer_label_elapsed;
 GtkWidget *task_label_code;
 GtkWidget *task_label_description;
 GtkWidget *last_task_label_description;
+
+gboolean update_elapsed_time(gpointer data);
 
 GtkWidget* build_main_display_frame()
 {
@@ -73,6 +77,8 @@ GtkWidget* build_main_display_frame()
   gtk_label_set_line_wrap(GTK_LABEL(last_task_label_description), TRUE);
   gtk_box_pack_start(GTK_BOX(current_tasks_box), last_task_label_description, TRUE, TRUE, 10);
 
+  g_timeout_add(60000, update_elapsed_time, NULL);
+
   return main_display_frame;
 }
 
@@ -105,6 +111,10 @@ void set_current_task(const gchar* code, const gchar* description)
 
 gboolean update_elapsed_time(gpointer data)
 {
+  if (!running) {
+    return TRUE;
+  }
+
   char *elapsed_markup;
 
   elapsed = elapsed + 1;
@@ -132,7 +142,7 @@ gboolean update_elapsed_time(gpointer data)
   return TRUE;
 }
 
-void set_check_in(guint value, guint elapsed_in_check_in)
+void set_check_in(guint value, guint elapsed_in_check_in, guint fixed_checkout)
 {
   char *check_in_markup;
   char *check_out_markup;
@@ -145,7 +155,12 @@ void set_check_in(guint value, guint elapsed_in_check_in)
 
   check_in_markup = g_markup_printf_escaped(format, init_hours, init_minutes);
 
-  check_out = 9 * 60 + value;
+  if (fixed_checkout) {
+    check_out = fixed_checkout;
+  } else {
+    check_out = 9 * 60 + value;
+  }
+
   int end_minutes = check_out % 60;
   int end_hours = check_out / 60;
 
@@ -156,8 +171,8 @@ void set_check_in(guint value, guint elapsed_in_check_in)
   
   elapsed = elapsed_in_check_in - 1;
 
+  running = 1;
   update_elapsed_time(NULL);
-  g_timeout_add(60000, update_elapsed_time, NULL);
 
   g_free(check_in_markup);
   g_free(check_out_markup);

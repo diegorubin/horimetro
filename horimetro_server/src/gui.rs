@@ -39,11 +39,16 @@ pub fn show_next_frame() {
 }
 
 pub fn check_in(value: u32) -> u32 {
+    check_in_with_check_out(value, 0)
+}
+
+pub fn check_in_with_check_out(check_in: u32, check_out: u32) -> u32 {
     let date: DateTime<Local> = Local::now();
-    let elapsed: u32 = (date.minute() + date.hour() * 60) - value;
+    let elapsed: u32 = (date.minute() + date.hour() * 60) - check_in;
+
     let c = Connection::get_private(BusType::Session).unwrap();
     let m = Message::new_method_call(SERVICE, PATH, INTERFACE, "CheckIn").unwrap()
-        .append1(value).append1(elapsed);
+        .append1(check_in).append1(elapsed).append1(check_out);
     c.send_with_reply_and_block(m, 2000).unwrap();
-    value
+    check_in
 }
