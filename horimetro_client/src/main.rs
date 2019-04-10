@@ -1,9 +1,24 @@
+extern crate clap;
+
+use clap::{Arg, App, SubCommand};
 use std::net::{TcpStream};
 use std::io::{BufReader, BufWriter, Write, BufRead};
 use std::io::Result;
 use std::env;
 
 fn main() -> Result<()> {
+
+    let matches = App::new("horimetro_client")
+      .version("0.0.1")
+      .author("Diego Rubin. rubin.diego@gmail.com")
+      .about("Horimetro client.")
+      .subcommand(SubCommand::with_name("CheckIn")
+                  .about("execute check in")
+                  .arg(Arg::with_name("CheckInValue")
+                       .required(true)
+                       .help("example of format 08:00"))) 
+      .get_matches();
+
     let args: Vec<String> = env::args().collect();
 
     let mut server_address = String::from("127.0.0.1:21000");
