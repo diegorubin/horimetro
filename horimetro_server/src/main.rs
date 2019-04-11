@@ -125,13 +125,23 @@ fn handle_client(stream: TcpStream) {
                 }
             }
         },
+        "GetTaskList" => {
+            let mut tasks = Vec::new();
+            for day in get_report_days() {
+                for task in tasks::report(day) {
+                    tasks.push(format!("{}\t{}\t{}\t{}", task.0, task.1, task.2, task.3));
+                }
+            }
+            let s_tasks = tasks.join("|LF|").to_owned();
+            let message: &str = &s_tasks[..];
+            write_response(&stream, message);
+        },
         "RemoveTask" => {
             let task = read_complete_task(&stream);
             tasks::remove_task(task.0, task.1, task.2, task.3).expect("error on remove task");
         },
         "Report" => {
             gui::clear_tasks();
-
             for day in get_report_days() {
                 for task in tasks::report(day) {
                     gui::add_task(task.0, task.1, task.2, task.3);

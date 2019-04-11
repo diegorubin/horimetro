@@ -8,7 +8,7 @@ use std::env;
 
 fn main() -> Result<()> {
 
-    let matches = App::new("horimetro_client")
+    App::new("horimetro_client")
       .version("0.0.1")
       .author("Diego Rubin. rubin.diego@gmail.com")
       .about("Horimetro client.")
@@ -45,6 +45,8 @@ fn main() -> Result<()> {
                        .help("example label:description")))
       .subcommand(SubCommand::with_name("CloseCurrenTask")
                   .about("close the current task"))
+      .subcommand(SubCommand::with_name("GetTaskList")
+                  .about("recover tasks of report"))
       .subcommand(SubCommand::with_name("RemoveTask")
                   .about("remove a task")
                   .arg(Arg::with_name("DateValue")
@@ -106,7 +108,7 @@ fn main() -> Result<()> {
             let mut reader = BufReader::new(&stream);
             let mut response = String::new();
             reader.read_line(&mut response).expect("could not read");
-            print!("{}", response);
+            print!("{}", response.replace("|LF|", "\n"));
         },
         Err(e) => {
             println!("Failed to connect: {}", e);
