@@ -43,7 +43,7 @@ fn main() -> Result<()> {
                   .arg(Arg::with_name("LabelWithDescriptionValue")
                        .required(true)
                        .help("example label:description")))
-      .subcommand(SubCommand::with_name("CloseCurrenTask")
+      .subcommand(SubCommand::with_name("CloseCurrentTask")
                   .about("close the current task"))
       .subcommand(SubCommand::with_name("GetTaskList")
                   .about("recover tasks of report"))
