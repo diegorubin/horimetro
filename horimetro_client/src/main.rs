@@ -30,6 +30,8 @@ fn main() -> Result<()> {
                   .arg(Arg::with_name("CheckOutValue")
                        .required(true)
                        .help("example of format 17:00")))
+      .subcommand(SubCommand::with_name("CheckOut")
+                  .about("execute check out"))
       .subcommand(SubCommand::with_name("CreateTask")
                   .about("create a task with label and description")
                   .arg(Arg::with_name("LabelValue")

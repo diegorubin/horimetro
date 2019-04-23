@@ -142,6 +142,11 @@ gboolean update_elapsed_time(gpointer data)
   return TRUE;
 }
 
+void do_check_out() 
+{
+    running = 0;
+}
+
 void set_check_in(guint value, guint elapsed_in_check_in, guint fixed_checkout)
 {
   char *check_in_markup;

@@ -125,6 +125,10 @@ fn handle_client(stream: TcpStream) {
                 }
             }
         },
+        "CheckOut" => {
+            gui::check_out();
+            write_response(&stream, "check out done!");
+        },
         "GetTaskList" => {
             let mut tasks = Vec::new();
             for day in get_report_days() {

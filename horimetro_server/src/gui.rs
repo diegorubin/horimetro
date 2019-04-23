@@ -52,3 +52,9 @@ pub fn check_in_with_check_out(check_in: u32, check_out: u32) -> u32 {
     c.send_with_reply_and_block(m, 2000).unwrap();
     check_in
 }
+
+pub fn check_out() {
+    let c = Connection::get_private(BusType::Session).unwrap();
+    let m = Message::new_method_call(SERVICE, PATH, INTERFACE, "CheckOut").unwrap();
+    c.send_with_reply_and_block(m, 2000).unwrap();
+}

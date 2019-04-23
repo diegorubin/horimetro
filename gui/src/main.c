@@ -41,6 +41,9 @@ static const gchar introspection_xml[] =
 "      <arg type='u' name='fixed_checkout' direction='in'/>"              
 "      <arg type='s' name='result' direction='out'/>"              
 "    </method>"                               
+"    <method name='CheckOut'>"
+"      <arg type='s' name='result' direction='out'/>"              
+"    </method>"                               
 "  </interface>"                              
 "</node>"; 
 
@@ -117,6 +120,14 @@ void method_handler(GDBusConnection *conn,
     g_variant_get(parameters, "(uuu)", &value, &elapsed, &fixed_checkout);
 
     set_check_in(value, elapsed, fixed_checkout);
+
+    g_dbus_method_invocation_return_value(invocation,
+                    g_variant_new("(s)", "ok"));
+    return;
+  }
+
+  if (!g_strcmp0(method_name, "CheckOut")) {
+    do_check_out();
 
     g_dbus_method_invocation_return_value(invocation,
                     g_variant_new("(s)", "ok"));
